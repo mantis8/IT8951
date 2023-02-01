@@ -8,14 +8,14 @@
 // See the documentation for more information
 //
 
-#ifndef MATI_HARDWARE_ABSTRACTION_GPIO_H
-#define MATI_HARDWARE_ABSTRACTION_GPIO_H
+#ifndef MATI_HARDWARE_ABSTRACTION_IGPIO_H
+#define MATI_HARDWARE_ABSTRACTION_IGPIO_H
 
 #include <functional>
 
 namespace mati::hardware_abstraction {
 
-class Gpio {
+class IGpio {
   public:
     virtual void write(bool level) noexcept = 0;
     virtual bool read() noexcept = 0;
@@ -24,4 +24,4 @@ class Gpio {
 
 } // mati::hardware_abstraction
 
-#endif // MATI_HARDWARE_ABSTRACTION_GPIO_H
+#endif // MATI_HARDWARE_ABSTRACTION_IGPIO_H

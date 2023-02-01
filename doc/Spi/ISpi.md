@@ -1,9 +1,9 @@
 # _mati::hardware_abstraction::_ **Spi**
 
-Defined in header [`Spi.h`](../../lib/src/Spi.h).
+Defined in header [`ISpi.h`](../../lib/src/ISpi.h).
 
 ```cpp
-class Spi;
+class ISpi;
 ```
 
 Defines the SPI (master) functionality needed to access the IT8951.

@@ -1,4 +1,4 @@
-# _mati::hardware_abstraction::Gpio::_**read**
+# _mati::hardware_abstraction::IGpio::_**read**
 
 ```cpp
 virtual bool read() noexcept = 0;

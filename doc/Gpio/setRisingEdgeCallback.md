@@ -1,4 +1,4 @@
-# _mati::hardware_abstraction::Gpio::_**setRisingEdgeCallback**
+# _mati::hardware_abstraction::IGpio::_**setRisingEdgeCallback**
 
 ```cpp
 virtual void setRisingEdgeCallback(std::function<void(void)>&& callback) noexcept = 0;

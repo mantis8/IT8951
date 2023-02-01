@@ -1,4 +1,4 @@
-# _mati::hardware_abstraction::Spi::_**transfer**
+# _mati::hardware_abstraction::ISpi::_**transfer**
 
 ```cpp
 virtual bool transfer(std::span<uint16_t> txBuffer, const std::span<uint16_t> rxBuffer) noexcept = 0;

@@ -1,4 +1,4 @@
-# _mati::hardware_abstraction::Gpio::_**write**
+# _mati::hardware_abstraction::IGpio::_**write**
 
 ```cpp
 virtual void write(bool level) noexcept = 0;

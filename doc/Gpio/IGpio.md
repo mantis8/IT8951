@@ -1,9 +1,9 @@
-# _mati::hardware_abstraction::_ **Gpio**
+# _mati::hardware_abstraction::_ **IGpio**
 
-Defined in header [`Gpio.h`](../../lib/src/Gpio.h).
+Defined in header [`IGpio.h`](../../lib/src/IGpio.h).
 
 ```cpp
-class Gpio;
+class IGpio;
 ```
 
 Defines the GPIO functionality needed to access the IT8951. It's the same interface for input and output pins.
