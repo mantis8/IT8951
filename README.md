@@ -24,7 +24,7 @@ The module is written in C++20 with the following design goals:
 
 ## Detailed documentation
 
-You can find a detailed documentation in the folder "docs"
+You can find a detailed documentation in the folder "doc"
 
 ## Integration
 
