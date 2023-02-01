@@ -1,9 +1,11 @@
 //
-// Copyright (c) 2023 Manuel Tischhauser.
+// Copyright (c) 2023 Manuel Tischhauser
 //
-// See the documentation for more information.
+// Distributed under the MIT Software License
+// See accompanying file LICENSE or copy at
+// https://opensource.org/licenses/MIT
 //
-// Distributed under the MIT License (See accompanying file LICENSE).
+// See the documentation for more information
 //
 
 #ifndef MATI_HARDWARE_ABSTRACTION_GPIO_H
