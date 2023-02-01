@@ -21,4 +21,4 @@ class Spi {
 
 } // mati::hardware_abstraction
 
-#endif // MATI_HARDWARE_ABSTRACTION_ISPI_H
+#endif // MATI_HARDWARE_ABSTRACTION_SPI_H
