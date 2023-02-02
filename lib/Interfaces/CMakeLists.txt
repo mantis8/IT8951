@@ -1,0 +1,2 @@
+add_library(Interfaces INTERFACE)
+target_include_directories(Interfaces INTERFACE src)

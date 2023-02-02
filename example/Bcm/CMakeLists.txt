@@ -6,4 +6,4 @@ add_library(Bcm STATIC src/Spi.cpp
 target_include_directories(Bcm PRIVATE thirdparty
                                PUBLIC src)
 
-target_link_libraries(Bcm PUBLIC IT8951)                              
+target_link_libraries(Bcm PUBLIC Interfaces)                              
