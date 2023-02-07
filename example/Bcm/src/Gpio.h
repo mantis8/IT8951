@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <thread>
 
 #include "IGpio.h"
 
@@ -26,8 +27,11 @@ class Gpio : public IGpio {
     void setRisingEdgeCallback(std::function<void(void)>&& callback) noexcept override;
 
   private:
+    void detectRisingEdge();
+
     const uint32_t pin_;
     std::function<void(void)> callback_;
+    std::thread edgeDetector_;
 };
 
 } // mati::hardware_abstraction
