@@ -8,8 +8,10 @@ Method which transfers the elements contained in the transmit buffer from the ma
 
 ## Parameters
 
-- `txBuffer` - The buffer containing the elements to be transferred.
-- `rxBuffer` - The buffer where the received elements can be stored.
+- `txBuffer`  
+  The buffer containing the elements to be transferred.
+- `rxBuffer`  
+The buffer where the received elements can be stored.
 
 ## Return value
 

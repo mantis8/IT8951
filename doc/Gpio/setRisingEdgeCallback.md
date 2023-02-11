@@ -8,7 +8,8 @@ Sets the function which is called when a rising edge is detected on this pin.
 
 ## Parameters
 
-- `callback` - The rising edge callback function.
+- `callback`  
+The rising edge callback function.
 
 ## Return value
 (none)
