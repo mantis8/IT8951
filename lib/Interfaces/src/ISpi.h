@@ -12,7 +12,7 @@
 #define MATI_HARDWARE_ABSTRACTION_ISPI_H
 
 #include <span>
-#include <cstint>
+#include <cstdint>
 
 namespace mati::hardware_abstraction {
 
