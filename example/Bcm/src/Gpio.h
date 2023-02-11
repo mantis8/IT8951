@@ -13,16 +13,16 @@
 
 namespace mati::hardware_abstraction {
 
-enum class TFunctionality {
+enum class Functionality {
     input = 0,
     output   
 };
 
 class Gpio : public IGpio {
   public:
-    Gpio(const uint32_t pin, const TFunctionality functionality);
+    Gpio(const uint32_t pin, const Functionality functionality);
 
-    void write(bool level) noexcept override;
+    void write(const bool level) noexcept override;
     bool read() noexcept override;
     void setRisingEdgeCallback(std::function<void(void)>&& callback) noexcept override;
 

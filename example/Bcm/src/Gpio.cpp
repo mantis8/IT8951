@@ -1,21 +1,22 @@
+#include "Gpio.h"
+
 #include <stdexcept>
 
-#include "Gpio.h"
 #include "InitManager.h"
 #include "bcm2835.h"
 
 namespace mati::hardware_abstraction {
 
-Gpio::Gpio(const uint32_t pin, const TFunctionality functionality) : pin_{pin}, callback_{[](){}}, edgeDetector_{} {
+Gpio::Gpio(const uint32_t pin, const Functionality functionality) : pin_{pin}, callback_{[](){}}, edgeDetector_{} {
     // initialize the bcm library
     (void)InitManager::getInstance();
 
     switch (functionality) {
-      case TFunctionality::input:        
+      case Functionality::input:        
         bcm2835_gpio_fsel(pin_, BCM2835_GPIO_FSEL_INPT);
         break;
 
-      case TFunctionality::output:
+      case Functionality::output:
         bcm2835_gpio_fsel(pin_, BCM2835_GPIO_FSEL_OUTP);
         break;
 
@@ -29,7 +30,7 @@ Gpio::Gpio(const uint32_t pin, const TFunctionality functionality) : pin_{pin}, 
     edgeDetector_ = std::thread{&Gpio::detectRisingEdge, this};
 }
 
-void Gpio::write(bool level) noexcept {     
+void Gpio::write(const bool level) noexcept {     
     // true = high, false = low;
     if (level) {
         bcm2835_gpio_set(pin_);
