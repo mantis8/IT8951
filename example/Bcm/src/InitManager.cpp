@@ -1,6 +1,7 @@
+#include "InitManager.h"
+
 #include <stdexcept>
 
-#include "InitManager.h"
 #include "bcm2835.h"
 
 namespace mati::hardware_abstraction {
@@ -12,7 +13,7 @@ InitManager& InitManager::getInstance() {
 }
 
 InitManager::InitManager() {
-    if(1 != bcm2835_init()) {
+    if (1 != bcm2835_init()) {
         throw std::runtime_error("bcm library initialization failed");
     }
 }
