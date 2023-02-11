@@ -42,10 +42,14 @@ The IT8951 module depends on the following headers of the C++ standard library:
 - `<functional>`
 - `<atomic>`
 
+[_Waveshare Wiki_]
+
 ## References
 
-1. Waveshare wiki. [__Waveshare Wiki__][waveshare-wiki], 29 January 2023, https://www.waveshare.com/wiki/Main_Page#Display-e-Paper
-2. Kirilov, Viktor. [_doctest_][doctest], 05.02.2020, https://github.com/onqtam/doctest, MIT
+1. Waveshare wiki. [waveshare-wiki], 29 January 2023, https://www.waveshare.com/wiki/Main_Page#Display-e-Paper
+2. IT8951 specifications. [IT8951 Specifications], https://www.waveshare.com/w/upload/1/18/IT8951_D_V0.2.4.3_20170728.pdf
+3. Kirilov, Viktor. [_doctest_][doctest], 05.02.2020, https://github.com/onqtam/doctest, MIT
 
 [waveshare-wiki]: https://www.waveshare.com/wiki/Main_Page#Display-e-Paper
+[IT8951 Specifications]: https://www.waveshare.com/w/upload/1/18/IT8951_D_V0.2.4.3_20170728.pdf
 [doctest]:  https://github.com/onqtam/doctest
