@@ -1,6 +1,6 @@
 # _mati::hardware_abstraction::_ **Spi**
 
-Defined in header [`ISpi.h`](../../lib/src/ISpi.h).
+Defined in header [`ISpi.h`](../../lib/Interfaces//src/ISpi.h).
 
 ```cpp
 class ISpi;

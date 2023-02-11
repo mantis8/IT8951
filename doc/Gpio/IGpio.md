@@ -1,6 +1,6 @@
 # _mati::hardware_abstraction::_ **IGpio**
 
-Defined in header [`IGpio.h`](../../lib/src/IGpio.h).
+Defined in header [`IGpio.h`](../../lib/Interfaces/src/IGpio.h).
 
 ```cpp
 class IGpio;
