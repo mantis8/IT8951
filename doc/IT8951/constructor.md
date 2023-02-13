@@ -11,9 +11,9 @@ Constructs the IT8951.
 - `spi`  
 The SPI connected to the IT8951.
 - `resetGpo`  
-The GPIO connected to the reset pin of the IT8951.
+The GPIO connected to the reset pin of the IT8951. This pin needs to be writable.
 - `busyGpi`  
-The GPIO connected to the busy pin of the IT891.
+The GPIO connected to the busy pin of the IT891. This pin needs to be readable.
 
 ## Note
 
