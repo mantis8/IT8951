@@ -8,5 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # subdirectories
+add_subdirectory(lib/IT8951)
 add_subdirectory(lib/Interfaces)
 add_subdirectory(example/Bcm)
+add_subdirectory(example/Test)

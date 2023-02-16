@@ -29,7 +29,7 @@ class IT8951 {
         error
     };
 
-    struct DeviceInfo() {
+    struct DeviceInfo {
         DeviceInfo(uint16_t width, uint16_t height, uint32_t imageBufferAddress,
                    std::string firmwareVersion, std::string lutVersion) : 
                    width_{width}, height_{height}, imageBufferAddress_{imageBufferAddress},
@@ -42,11 +42,14 @@ class IT8951 {
         const std::string lutVersion_;
     };
 
-    IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetGpo, hardware_abstraction::IGpio& busyGpi);
+    IT8951(hardware_abstraction::ISpi& spi,
+           hardware_abstraction::IGpio& resetPin,
+           hardware_abstraction::IGpio& busyPin);
+
     IT8951(const IT8951&) = delete;
     IT8951(IT8951&&) = delete;
-    operator=(const IT8951&) = delete;
-    operator=(IT8951&&) = delete;
+    IT8951& operator=(const IT8951&) = delete;
+    IT8951& operator=(IT8951&&) = delete;
 
     Status wakeUp();
     Status standby();
@@ -54,9 +57,11 @@ class IT8951 {
     DeviceInfo getDeviceInfo();   
     Status setVcom(float vcom);
     // TODO: document the following
-    Status writeData(const uint32_t imageBufferAddress, const std::span<uint16_t> data, const uint16_t yCoordinate,
-                     const uint16_t, xCoordinate, const uint16_t width, const uint16_t height);
-    Status display(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
+    Status writeData(const uint32_t imageBufferAddress, const std::span<uint16_t> data,
+                     const uint16_t xCoordinate, const uint16_t yCoordinate,
+                     const uint16_t width, const uint16_t height);
+    Status display(const uint16_t xCoordinate, const uint16_t yCoordinate,
+                   const uint16_t width, const uint16_t height);
     
   
   private:
@@ -64,11 +69,17 @@ class IT8951 {
     Status enablePackedMode();
     Status disablePackedMode(); // TODO: is this needed?
 
-    hardware_abstraction::ISpi& spi;
-    harware_abstraction::IGpio& resetGpo;
-    hardware_abstraction::IGpio& busyGpi;
-
+    hardware_abstraction::ISpi& spi_;
+    hardware_abstraction::IGpio& resetPin_;
+    hardware_abstraction::IGpio& busyPin_;
 };
+
+template<uint32_t BufferSize>
+IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi,
+                           hardware_abstraction::IGpio& resetPin,
+                           hardware_abstraction::IGpio& busyPin) : 
+    spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {}
+
 } // mati
 
 #endif // MATI_IT8951_H
