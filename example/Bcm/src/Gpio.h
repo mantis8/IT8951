@@ -13,13 +13,13 @@
 
 namespace mati::hardware_abstraction {
 
-enum class Functionality {
-    input = 0,
-    output   
-};
-
 class Gpio : public IGpio {
   public:
+    enum class Functionality {
+        input = 0,
+        output   
+    };
+
     Gpio(const uint32_t pin, const Functionality functionality);
 
     void write(const bool level) noexcept override;

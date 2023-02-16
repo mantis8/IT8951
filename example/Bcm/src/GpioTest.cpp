@@ -12,8 +12,8 @@ int main() {
     const uint8_t busyPin = 24;
 
     try {
-        Gpio output{resetPin, Functionality::output};
-        Gpio input{busyPin, Functionality::input};
+        Gpio output{resetPin, Gpio::Functionality::output};
+        Gpio input{busyPin, Gpio::Functionality::input};
 
         // first rising edge
         std::cout << "set output low..." << std::endl;
