@@ -15,13 +15,14 @@
 #include <cstdint>
 #include <span>
 #include <atomic>
+#include <array>
 
 #include "ISpi.h"
 #include "IGpio.h"
 
 namespace mati {
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 class IT8951 {
   public:
     enum class Status {
@@ -52,63 +53,143 @@ class IT8951 {
     void reset();
     DeviceInfo getDeviceInfo();   
     Status setVcom(const float vcom);
-    // TODO: document the following
     Status writeImage(const std::span<uint16_t> image, const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
     Status display(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
     Status clear(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
 
   private:
+    // IT8951 SPI preambles
+    static constexpr uint16_t cWriteCommand_{0x6000};
+    static constexpr uint16_t cWriteData_{0x0000};
+    static constexpr uint16_t cReadData_{0x1000};
+    // IT8951 commands
+    static constexpr uint16_t cWakeUp_{0x0001};
+    static constexpr uint16_t cStandby_{0x0002};
+    static constexpr uint16_t cSleep_{0x0003};
+    static constexpr uint16_t cReadRegister_{0x0010};
+    static constexpr uint16_t cWriteRegister_{0x0011};
+    static constexpr uint16_t cLoadImageArea_{0x0021};
+    static constexpr uint16_t cEndLoadImage_{0x0022};
+    static constexpr uint16_t cDisplayArea_{0x0034};
+    static constexpr uint16_t cSetVcom_{0x0039};
+    static constexpr uint16_t cGetDeviceInfo_{0x0302};
+
+    Status writeCommand(const uint16_t command);
+    Status writeCommand(const uint16_t command, const std::span<uint16_t> parameters);
+    Status writeData(const std::span<uint16_t> buffer);
+    Status readData(const std::span<uint16_t> buffer);
+    Status writeRegister(const uint16_t address, const uint16_t value);
+    Status readRegister(const uint16_t address, uint16_t& value);
+    void waitUntilIdle();
     float getVcom(); // TODO: is this needed?
-    Status enablePackedMode();
+    Status enablePackedMode(); // TODO: is this needed?
     Status disablePackedMode(); // TODO: is this needed?
 
+    std::array<uint16_t, BufferSize> txBuffer_;
+    std::array<uint16_t, BufferSize> rxBuffer_;
     std::atomic_flag busyFlag_;
     hardware_abstraction::ISpi& spi_;
     hardware_abstraction::IGpio& resetPin_;
     hardware_abstraction::IGpio& busyPin_;
 };
 
-template<uint32_t BufferSize>
-IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin) : 
-    spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {}
+template<size_t BufferSize>
+IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin) : spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {
+    static_assert(BufferSize >= 2, "BufferSize needs to be at least 2");
 
-template<uint32_t BufferSize>
+    busyFlag_.clear();
+    resetPin_.write(true);
+}
+
+template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::wakeUp() {
     // TODO   
 }
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::standby() {
     // TODO
 }
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 void IT8951<BufferSize>::reset() {
     // TODO
 }
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 IT8951<BufferSize>::DeviceInfo IT8951<BufferSize>::getDeviceInfo() {
     // TODO
 }
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::setVcom(const float vcom) {
     // TODO
 }
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::writeImage(const std::span<uint16_t> image, const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height) {
     // TODO
 }
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::display(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height) {
     // TODO
 }
 
-template<uint32_t BufferSize>
+template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::clear(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height) {
+    // TODO
+}
+
+template<size_t BufferSize>
+IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t command) {
+    if (busyFlag_.test_and_set(std::memory_order_acquire)) {
+        return Status::busy;
+    }
+
+    Status result{Status::ok};
+
+    txBuffer_.at(0) = cWriteCommand_;
+    txBuffer_.at(1) = command;
+
+    waitUntilIdle();
+
+    if (!spi_.transfer(std::span{txBuffer_}.subspan(2), std::span{rxBuffer_}.subspan(2))) {
+        result = Status::error;    
+    }
+
+    busyFlag_.clear(std::memory_order_release);
+
+    return result;
+}
+
+template<size_t BufferSize>
+IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t command, const std::span<uint16_t> parameters){
+    // TODO
+}
+
+template<size_t BufferSize>
+IT8951<BufferSize>::Status IT8951<BufferSize>::writeData(const std::span<uint16_t> buffer) {
+    // TODO
+}
+
+template<size_t BufferSize>
+IT8951<BufferSize>::Status IT8951<BufferSize>::readData(const std::span<uint16_t> buffer) {
+    // TODO
+}
+
+template<size_t BufferSize>
+IT8951<BufferSize>::Status IT8951<BufferSize>::writeRegister(const uint16_t address, const uint16_t value) {
+    // TODO
+}
+
+template<size_t BufferSize>
+IT8951<BufferSize>::Status IT8951<BufferSize>::readRegister(const uint16_t address, uint16_t& value) {
+    // TODO
+}
+
+template<size_t BufferSize>
+void IT8951<BufferSize>::waitUntilIdle() {
     // TODO
 }
 
