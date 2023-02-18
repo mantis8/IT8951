@@ -1,7 +1,7 @@
 # _mati::IT8951\<BufferSize\>::_**setVcom**
 
 ```cpp
-Status setVcom(float vcom);
+Status setVcom(const float vcom);
 ```
 Sets the VCOM value. This operation should always be performed before using the IT8951 to ensure correct behavior. The VCOM value is dependent on the used display and can be found on the connector.  
 TODO: image
