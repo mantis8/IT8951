@@ -16,6 +16,7 @@
 #include <span>
 #include <atomic>
 #include <array>
+#include <semaphore>
 
 #include "ISpi.h"
 #include "IGpio.h"
@@ -88,13 +89,15 @@ class IT8951 {
     std::array<uint16_t, BufferSize> txBuffer_;
     std::array<uint16_t, BufferSize> rxBuffer_;
     std::atomic_flag busyFlag_;
+    std::binary_semaphore busySemaphore_{};
     hardware_abstraction::ISpi& spi_;
     hardware_abstraction::IGpio& resetPin_;
     hardware_abstraction::IGpio& busyPin_;
 };
 
 template<size_t BufferSize>
-IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin) : spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {
+IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin)
+                           : txBuffer_{}, rxBuffer_{}, busyFlag_{}, busySemaphore_{0}, spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {
     static_assert(BufferSize >= 2, "BufferSize needs to be at least 2");
 
     busyFlag_.clear();
@@ -165,7 +168,36 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t comma
 
 template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t command, const std::span<uint16_t> parameters){
-    // TODO
+    if (busyFlag_.test_and_set(std::memory_order_acquire)) {
+        return Status::busy;
+    }
+
+    Status result{Status::ok};
+
+    txBuffer_.at(0) = cWriteCommand_;
+    txBuffer_.at(1) = command;
+
+    waitUntilIdle();
+
+    if (!spi_.transfer(std::span{txBuffer_}.subspan(2), std::span{rxBuffer_}.subspan(2))) {
+        result = Status::error;    
+    }
+
+    txBuffer_.at(0) = cWriteData_;
+
+    for (const auto p : parameters) {
+        txBuffer_.at(1) = p;
+
+        waitUntilIdle();
+
+        if (!spi_.transfer(std::span{txBuffer_}.subspan(2), std::span{rxBuffer_}.subspan(2))) {
+            result = Status::error;    
+        }
+    }
+
+    busyFlag_.clear(std::memory_order_release);
+
+    return result;
 }
 
 template<size_t BufferSize>
@@ -190,7 +222,15 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::readRegister(const uint16_t addre
 
 template<size_t BufferSize>
 void IT8951<BufferSize>::waitUntilIdle() {
-    // TODO
+    // pin low = busy, pin high = idle
+    if (busyPin_.read()) {
+        return;
+    } else {
+        busyPin_.setRisingEdgeCallback([this](){busySemaphore_.release();});
+        busySemaphore_.acquire();
+        
+        busyPin_.setRisingEdgeCallback([](){});
+    }
 }
 
 } // mati
