@@ -17,6 +17,7 @@
 #include <atomic>
 #include <array>
 #include <semaphore>
+#include <thread>
 
 #include "ISpi.h"
 #include "IGpio.h"
@@ -51,6 +52,7 @@ class IT8951 {
 
     Status wakeUp();
     Status standby();
+    Status sleep();
     void reset();
     DeviceInfo getDeviceInfo();   
     Status setVcom(const float vcom);
@@ -89,7 +91,6 @@ class IT8951 {
     std::array<uint16_t, BufferSize> txBuffer_;
     std::array<uint16_t, BufferSize> rxBuffer_;
     std::atomic_flag busyFlag_;
-    std::binary_semaphore busySemaphore_{};
     hardware_abstraction::ISpi& spi_;
     hardware_abstraction::IGpio& resetPin_;
     hardware_abstraction::IGpio& busyPin_;
@@ -97,7 +98,7 @@ class IT8951 {
 
 template<size_t BufferSize>
 IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin)
-                           : txBuffer_{}, rxBuffer_{}, busyFlag_{}, busySemaphore_{0}, spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {
+                           : txBuffer_{}, rxBuffer_{}, busyFlag_{}, spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {
     static_assert(BufferSize >= 2, "BufferSize needs to be at least 2");
 
     busyFlag_.clear();
@@ -106,17 +107,25 @@ IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction
 
 template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::wakeUp() {
-    // TODO   
+    return writeCommand(cWakeUp_); 
 }
 
 template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::standby() {
-    // TODO
+    return writeCommand(cStandby_);
+}
+
+template<size_t BufferSize>
+IT8951<BufferSize>::Status IT8951<BufferSize>::sleep() {
+    return writeCommand(cSleep_);
 }
 
 template<size_t BufferSize>
 void IT8951<BufferSize>::reset() {
-    // TODO
+    resetPin_.write(false);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    waitUntilIdle();
 }
 
 template<size_t BufferSize>
@@ -222,15 +231,23 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::readRegister(const uint16_t addre
 
 template<size_t BufferSize>
 void IT8951<BufferSize>::waitUntilIdle() {
+    std::binary_semaphore busySemaphore{0};
+
+    bool busyRised = false;
+    busyPin_.setRisingEdgeCallback([&busySemaphore, &busyRised](){
+        // release the semaphore only once
+        if (!busyRised) {
+            busySemaphore.release();
+            busyRised = true;
+        }       
+    });
+
     // pin low = busy, pin high = idle
-    if (busyPin_.read()) {
-        return;
-    } else {
-        busyPin_.setRisingEdgeCallback([this](){busySemaphore_.release();});
-        busySemaphore_.acquire();
-        
-        busyPin_.setRisingEdgeCallback([](){});
+    if (!busyPin_.read()) {
+        busySemaphore.acquire(); 
     }
+
+    busyPin_.setRisingEdgeCallback([](){});
 }
 
 } // mati
