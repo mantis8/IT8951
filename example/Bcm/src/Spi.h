@@ -17,7 +17,7 @@ class Spi : public ISpi {
     ~Spi();
 
     void setClockFrequency(const uint32_t frequency);
-    bool transfer(const std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) noexcept override;
+    bool transfer(std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) noexcept override;
 };
 
 } // mati::hardware_abstraction

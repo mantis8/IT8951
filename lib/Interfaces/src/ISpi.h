@@ -18,7 +18,7 @@ namespace mati::hardware_abstraction {
 
 class ISpi {
   public:
-    virtual bool transfer(const std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) noexcept = 0;
+    virtual bool transfer(std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) noexcept = 0;
 };
 
 } // mati::hardware_abstraction
