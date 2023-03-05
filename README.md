@@ -43,6 +43,7 @@ The IT8951 module depends on the following headers of the C++ standard library:
 - `<atomic>`
 - `<string>`
 - `<thread>`
+- `<algorithm>`
 
 [_Waveshare Wiki_]
 
