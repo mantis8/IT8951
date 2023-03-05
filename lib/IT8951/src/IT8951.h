@@ -124,8 +124,7 @@ template<size_t BufferSize>
 void IT8951<BufferSize>::reset() {
     resetPin_.write(false);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-    waitUntilIdle();
+    resetPin_.write(true);
 }
 
 template<size_t BufferSize>
@@ -166,7 +165,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t comma
 
     waitUntilIdle();
 
-    if (!spi_.transfer(std::span{txBuffer_}.subspan(2), std::span{rxBuffer_}.subspan(2))) {
+    if (!spi_.transfer(std::span{txBuffer_}.subspan(0, 2), std::span{rxBuffer_}.subspan(0, 2))) {
         result = Status::error;    
     }
 
@@ -188,7 +187,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t comma
 
     waitUntilIdle();
 
-    if (!spi_.transfer(std::span{txBuffer_}.subspan(2), std::span{rxBuffer_}.subspan(2))) {
+    if (!spi_.transfer(std::span{txBuffer_}.subspan(0, 2), std::span{rxBuffer_}.subspan(0, 2))) {
         result = Status::error;    
     }
 
@@ -199,7 +198,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t comma
 
         waitUntilIdle();
 
-        if (!spi_.transfer(std::span{txBuffer_}.subspan(2), std::span{rxBuffer_}.subspan(2))) {
+        if (!spi_.transfer(std::span{txBuffer_}.subspan(0, 2), std::span{rxBuffer_}.subspan(0, 2))) {
             result = Status::error;    
         }
     }
