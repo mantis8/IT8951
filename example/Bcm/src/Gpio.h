@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <functional>
 #include <thread>
+#include <atomic>
 
 #include "IGpio.h"
 
@@ -21,6 +22,7 @@ class Gpio : public IGpio {
     };
 
     Gpio(const uint32_t pin, const Functionality functionality);
+    ~Gpio();
 
     void write(const bool level) noexcept override;
     bool read() noexcept override;
@@ -32,6 +34,7 @@ class Gpio : public IGpio {
     const uint32_t pin_;
     std::function<void(void)> callback_;
     std::thread edgeDetector_;
+    std::atomic_bool isRunning_;
 };
 
 } // mati::hardware_abstraction

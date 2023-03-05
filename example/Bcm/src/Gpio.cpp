@@ -7,7 +7,7 @@
 
 namespace mati::hardware_abstraction {
 
-Gpio::Gpio(const uint32_t pin, const Functionality functionality) : pin_{pin}, callback_{[](){}}, edgeDetector_{} {
+Gpio::Gpio(const uint32_t pin, const Functionality functionality) : pin_{pin}, callback_{[](){}}, edgeDetector_{}, isRunning_{false} {
     // initialize the bcm library
     (void)InitManager::getInstance();
 
@@ -27,7 +27,13 @@ Gpio::Gpio(const uint32_t pin, const Functionality functionality) : pin_{pin}, c
 
     bcm2835_gpio_set_pud(pin_, BCM2835_GPIO_PUD_OFF);
 
+    isRunning_ = true;
     edgeDetector_ = std::thread{&Gpio::detectRisingEdge, this};
+}
+
+Gpio::~Gpio() {
+    isRunning_ = false;
+    edgeDetector_.join();
 }
 
 void Gpio::write(const bool level) noexcept {     
@@ -54,7 +60,7 @@ void Gpio::setRisingEdgeCallback(std::function<void(void)>&& callback) noexcept 
 }
 
 void Gpio::detectRisingEdge() {
-    while (true) {
+    while (isRunning_) {
         if (!read()) {
             while (!read()) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(5));
