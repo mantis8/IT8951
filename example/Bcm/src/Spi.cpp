@@ -1,6 +1,6 @@
-#include <stdexcept>
-
 #include "Spi.h"
+
+#include <stdexcept>
 
 #include "InitManager.h"
 #include "bcm2835.h"
