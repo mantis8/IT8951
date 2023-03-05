@@ -18,6 +18,7 @@
 #include <array>
 #include <semaphore>
 #include <thread>
+#include <algorithm>
 
 #include "ISpi.h"
 #include "IGpio.h"
@@ -34,14 +35,16 @@ class IT8951 {
     };
 
     struct DeviceInfo {
+        DeviceInfo() : 
+            width{0u}, height{0u}, imageBufferAddress{0u}, firmwareVersion{}, lutVersion{} {};
         DeviceInfo(uint16_t width, uint16_t height, uint32_t imageBufferAddress, std::string firmwareVersion, std::string lutVersion) : 
-                   width_{width}, height_{height}, imageBufferAddress_{imageBufferAddress}, firmwareVersion_{firmwareVersion}, lutVersion_{lutVersion} {};
+            width{width}, height{height}, imageBufferAddress{imageBufferAddress}, firmwareVersion{firmwareVersion}, lutVersion{lutVersion} {};
 
-        const uint16_t width_;
-        const uint16_t height_;
-        const uint16_t imageBufferAddress_;
-        const std::string firmwareVersion_;
-        const std::string lutVersion_;
+        const uint16_t width;
+        const uint16_t height;
+        const uint32_t imageBufferAddress;
+        const std::string firmwareVersion;
+        const std::string lutVersion;
     };
 
     IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin);
@@ -129,7 +132,26 @@ void IT8951<BufferSize>::reset() {
 
 template<size_t BufferSize>
 IT8951<BufferSize>::DeviceInfo IT8951<BufferSize>::getDeviceInfo() {
-    // TODO
+    if (Status::ok != writeCommand(cGetDeviceInfo_)) {
+        return DeviceInfo{};
+    }
+
+    std::array<uint16_t, 20> dataBuffer{};
+
+    if (Status::ok != readData(dataBuffer)) {
+        return DeviceInfo{};
+    }
+
+    const uint16_t width = dataBuffer[0];
+    const uint16_t height = dataBuffer[1];
+
+    const uint32_t imageBufferAddress = (static_cast<uint32_t>(dataBuffer[2])<<16) |
+                                         static_cast<uint32_t>(dataBuffer[3]);
+
+    const std::string firmwareVersion{reinterpret_cast<char*>(dataBuffer.data())+4};
+    const std::string lutVersion{reinterpret_cast<char*>(dataBuffer.data())+12};
+
+    return DeviceInfo(width, height, imageBufferAddress, firmwareVersion, lutVersion);
 }
 
 template<size_t BufferSize>
@@ -210,12 +232,59 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeCommand(const uint16_t comma
 
 template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::writeData(const std::span<uint16_t> buffer) {
-    // TODO
+    if (busyFlag_.test_and_set(std::memory_order_acquire)) {
+        return Status::busy;
+    }
+
+    const auto transferSize = buffer.size() + 1; // +1 word preamble
+    if (transferSize > BufferSize) { 
+        return Status::error;
+    }
+
+    Status result{Status::ok};
+
+    txBuffer_.at(0) = cWriteData_;
+
+    std::copy(buffer.begin(), buffer.end(), txBuffer_.begin());
+    
+    waitUntilIdle();
+
+    if (!spi_.transfer(std::span{txBuffer_}.subspan(0, transferSize), std::span{rxBuffer_}.subspan(0, transferSize))) {
+        result = Status::error;    
+    }
+
+    busyFlag_.clear(std::memory_order_release);
+
+    return result;
 }
 
 template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::readData(const std::span<uint16_t> buffer) {
-    // TODO
+    if (busyFlag_.test_and_set(std::memory_order_acquire)) {
+        return Status::busy;
+    }
+
+    const auto transferSize = buffer.size() + 2; // +2 word preamble and dummy
+    if (transferSize > BufferSize) { 
+        return Status::error;
+    }
+
+    Status result{Status::ok};
+
+    txBuffer_.at(0) = cReadData_;
+    txBuffer_.at(1) = 0x0000; // dummy
+
+    waitUntilIdle();
+
+    if (!spi_.transfer(std::span{txBuffer_}.subspan(0, transferSize), std::span{rxBuffer_}.subspan(0, transferSize))) {
+        result = Status::error;    
+    }
+
+    std::copy(txBuffer_.begin() + 2, txBuffer_.begin() + transferSize, buffer.begin()); // +2 word preamble and dummy
+
+    busyFlag_.clear(std::memory_order_release);
+
+    return result;    
 }
 
 template<size_t BufferSize>

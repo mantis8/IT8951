@@ -9,7 +9,7 @@
 #include "Gpio.h"
 
 // TODO: make usefuls testcases
-TEST_CASE("sadfd") {
+TEST_CASE("Case 1") {
     try {
         mati::hardware_abstraction::Spi spi{};
         spi.setClockFrequency(2*1000*1000u);
@@ -26,6 +26,13 @@ TEST_CASE("sadfd") {
         CHECK(mati::IT8951<bufferSize>::Status::ok == it8951.standby());
         CHECK(mati::IT8951<bufferSize>::Status::ok == it8951.wakeUp());
 
+        // device info
+        auto info = it8951.getDeviceInfo();
+        CHECK(1872 == info.width);
+        CHECK(1404 == info.height);
+        CHECK(0x119F00 == info.imageBufferAddress);
+        CHECK("SWv_0.1." == info.firmwareVersion);
+        CHECK("M841_TFA5210" == info.lutVersion);
 
     } catch (std::runtime_error& e) {
         CHECK_MESSAGE(false, "exception occured: ", std::string(e.what())); 
