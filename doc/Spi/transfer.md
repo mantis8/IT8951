@@ -1,10 +1,10 @@
 # _mati::hardware_abstraction::ISpi::_**transfer**
 
 ```cpp
-virtual bool transfer(const std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) noexcept = 0;
+virtual bool transfer(std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) noexcept = 0;
 ```
 
-Method which transfers the elements contained in the transmit buffer from the master to the slave device while simultaneously receiving elements from the slave and stores it into the receive buffer. The transmit and the receive buffer should be of the same size. This is a blocking function, meaning that it should only return after the transfer is completely finished.
+Method which transfers the elements contained in the transmit buffer from the master to the slave device while simultaneously receiving elements from the slave and stores it into the receive buffer. The transmit and the receive buffer should be of the same size. This is a blocking function, meaning that it should only return after the transfer is completely finished. Depending on the hardware, it might be necessary to switch the endianess of the two buffers.
 
 ## Parameters
 
