@@ -25,7 +25,7 @@ Gpio::Gpio(const uint32_t pin, const Functionality functionality) : pin_{pin}, c
         break;
     }
 
-    bcm2835_gpio_set_pud(pin_, BCM2835_GPIO_PUD_OFF);
+    bcm2835_gpio_set_pud(pin_, BCM2835_GPIO_PUD_UP);
 
     isRunning_ = true;
     edgeDetector_ = std::thread{&Gpio::detectRisingEdge, this};
