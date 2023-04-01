@@ -145,11 +145,11 @@ IT8951<BufferSize>::DeviceInfo IT8951<BufferSize>::getDeviceInfo() {
     const uint16_t width = dataBuffer[0];
     const uint16_t height = dataBuffer[1];
 
-    const uint32_t imageBufferAddress = (static_cast<uint32_t>(dataBuffer[2])<<16) |
-                                         static_cast<uint32_t>(dataBuffer[3]);
+    const uint32_t imageBufferAddress = (static_cast<uint32_t>(dataBuffer[3])<<16) |
+                                         static_cast<uint32_t>(dataBuffer[2]);
 
-    const std::string firmwareVersion{reinterpret_cast<char*>(dataBuffer.data())+4};
-    const std::string lutVersion{reinterpret_cast<char*>(dataBuffer.data())+12};
+    const std::string firmwareVersion{reinterpret_cast<char*>(dataBuffer.data()+4)};
+    const std::string lutVersion{reinterpret_cast<char*>(dataBuffer.data()+12)};
 
     return DeviceInfo(width, height, imageBufferAddress, firmwareVersion, lutVersion);
 }
@@ -236,7 +236,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeData(const std::span<uint16_
         return Status::busy;
     }
 
-    const auto transferSize = buffer.size() + 1; // +1 word preamble
+    const auto transferSize = buffer.size() + 1u; // +1 word preamble
     if (transferSize > BufferSize) { 
         return Status::error;
     }
@@ -264,7 +264,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::readData(const std::span<uint16_t
         return Status::busy;
     }
 
-    const auto transferSize = buffer.size() + 2; // +2 word preamble and dummy
+    const auto transferSize = buffer.size() + 2u; // +2 word preamble and dummy
     if (transferSize > BufferSize) { 
         return Status::error;
     }
@@ -280,7 +280,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::readData(const std::span<uint16_t
         result = Status::error;    
     }
 
-    std::copy(txBuffer_.begin() + 2, txBuffer_.begin() + transferSize, buffer.begin()); // +2 word preamble and dummy
+    std::copy(rxBuffer_.begin() + 2, rxBuffer_.begin() + transferSize, buffer.begin()); // +2 word preamble and dummy
 
     busyFlag_.clear(std::memory_order_release);
 
