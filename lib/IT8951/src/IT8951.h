@@ -16,9 +16,11 @@
 #include <span>
 #include <atomic>
 #include <array>
+#include <tuple>
 #include <semaphore>
 #include <thread>
 #include <algorithm>
+#include <limits>
 
 #include "ISpi.h"
 #include "IGpio.h"
@@ -36,15 +38,13 @@ class IT8951 {
 
     struct DeviceInfo {
         DeviceInfo() : 
-            width{0u}, height{0u}, imageBufferAddress{0u}, firmwareVersion{}, lutVersion{} {};
-        DeviceInfo(uint16_t width, uint16_t height, uint32_t imageBufferAddress, std::string firmwareVersion, std::string lutVersion) : 
-            width{width}, height{height}, imageBufferAddress{imageBufferAddress}, firmwareVersion{firmwareVersion}, lutVersion{lutVersion} {};
+            width{0}, height{0}, imageBufferAddress{0}, firmwareVersion{}, lutVersion{} {};
 
-        const uint16_t width;
-        const uint16_t height;
-        const uint32_t imageBufferAddress;
-        const std::string firmwareVersion;
-        const std::string lutVersion;
+        uint16_t width;
+        uint16_t height;
+        uint32_t imageBufferAddress;
+        std::string firmwareVersion;
+        std::string lutVersion;
     };
 
     IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin);
@@ -57,8 +57,9 @@ class IT8951 {
     Status standby();
     Status sleep();
     void reset();
-    DeviceInfo getDeviceInfo();   
+    std::tuple<Status, DeviceInfo> getDeviceInfo();   
     Status setVcom(const float vcom);
+    std::tuple<Status, float> getVcom();
     Status writeImage(const std::span<uint16_t> image, const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
     Status display(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
     Status clear(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
@@ -87,7 +88,6 @@ class IT8951 {
     Status writeRegister(const uint16_t address, const uint16_t value);
     Status readRegister(const uint16_t address, uint16_t& value);
     void waitUntilIdle();
-    float getVcom(); // TODO: is this needed?
     Status enablePackedMode(); // TODO: is this needed?
     Status disablePackedMode(); // TODO: is this needed?
 
@@ -131,32 +131,70 @@ void IT8951<BufferSize>::reset() {
 }
 
 template<size_t BufferSize>
-IT8951<BufferSize>::DeviceInfo IT8951<BufferSize>::getDeviceInfo() {
-    if (Status::ok != writeCommand(cGetDeviceInfo_)) {
-        return DeviceInfo{};
+std::tuple<typename IT8951<BufferSize>::Status, typename IT8951<BufferSize>::DeviceInfo> IT8951<BufferSize>::getDeviceInfo() {
+    auto result = writeCommand(cGetDeviceInfo_);
+    if (Status::ok != result) {
+        return {result, DeviceInfo{}};
     }
 
-    std::array<uint16_t, 20> dataBuffer{};
+    std::array<uint16_t, 20> buffer{};
 
-    if (Status::ok != readData(dataBuffer)) {
-        return DeviceInfo{};
+    result = readData(buffer);
+    if (Status::ok != result) {
+        return {result, DeviceInfo{}};
     }
 
-    const uint16_t width = dataBuffer[0];
-    const uint16_t height = dataBuffer[1];
+    DeviceInfo info{};
 
-    const uint32_t imageBufferAddress = (static_cast<uint32_t>(dataBuffer[3])<<16) |
-                                         static_cast<uint32_t>(dataBuffer[2]);
+    info.width = buffer.at(0);
+    info.height = buffer.at(1);
 
-    const std::string firmwareVersion{reinterpret_cast<char*>(dataBuffer.data()+4)};
-    const std::string lutVersion{reinterpret_cast<char*>(dataBuffer.data()+12)};
+    info.imageBufferAddress = (static_cast<uint32_t>(buffer.at(3))<<16) |
+                               static_cast<uint32_t>(buffer.at(2));
 
-    return DeviceInfo(width, height, imageBufferAddress, firmwareVersion, lutVersion);
+    info.firmwareVersion = std::string{reinterpret_cast<char*>(buffer.data()+4)};
+    info.lutVersion = std::string{reinterpret_cast<char*>(buffer.data()+12)};
+
+    return {Status::ok, info};
 }
 
 template<size_t BufferSize>
 IT8951<BufferSize>::Status IT8951<BufferSize>::setVcom(const float vcom) {
-    // TODO
+    constexpr uint16_t maxValue = std::numeric_limits<uint16_t>::max();
+    const bool inRange = (vcom >= static_cast<float>(maxValue) / -1000.0f) && (vcom < 0);
+
+    if (!inRange) {
+        return Status::error;
+    }
+
+    std::array<uint16_t, 2> parameters;
+
+    parameters.at(0) = 0x0001; // parameter to 1 = set VCOM
+    parameters.at(1) = static_cast<uint16_t>(vcom * (-1000.0f)); // the VCOM value converted as described in the programming guide
+
+    return writeCommand(cSetVcom_, parameters);
+}
+
+template<size_t BufferSize>
+std::tuple<typename IT8951<BufferSize>::Status, float> IT8951<BufferSize>::getVcom() {
+    std::array<uint16_t, 1> parameters;
+    parameters.at(0) = 0x0000; // parameter to 0 = get VCOM
+    
+    auto result = writeCommand(cSetVcom_, parameters);
+    if (Status::ok != result) {
+        return {result, 0.0f};
+    }
+
+    std::array<uint16_t, 1> buffer;
+
+    result = readData(buffer);
+    if (Status::ok != result) {
+        return {result, 0.0f};
+    }
+
+    const float vcom = static_cast<float>(buffer.at(0)) / -1000.0f;
+
+    return {Status::ok, vcom};
 }
 
 template<size_t BufferSize>
@@ -299,10 +337,19 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::readRegister(const uint16_t addre
 
 template<size_t BufferSize>
 void IT8951<BufferSize>::waitUntilIdle() {
-    std::binary_semaphore busySemaphore{0};
+    while (!busyPin_.read()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 
+/*
+    if (busyPin_.read()) {
+        return;
+    }
+
+    std::binary_semaphore busySemaphore{0};
     bool busyRised = false;
-    busyPin_.setRisingEdgeCallback([&busySemaphore, &busyRised](){
+
+    busyPin_.setRisingEdgeCallback([&busySemaphore, &busyRised](){   
         // release the semaphore only once
         if (!busyRised) {
             busySemaphore.release();
@@ -315,7 +362,7 @@ void IT8951<BufferSize>::waitUntilIdle() {
         busySemaphore.acquire(); 
     }
 
-    busyPin_.setRisingEdgeCallback([](){});
+    busyPin_.setRisingEdgeCallback([](){});*/
 }
 
 } // mati
