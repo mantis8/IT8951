@@ -44,6 +44,8 @@ The IT8951 module depends on the following headers of the C++ standard library:
 - `<string>`
 - `<thread>`
 - `<algorithm>`
+- `<limits>`
+- `<tuple>`
 
 [_Waveshare Wiki_]
 
