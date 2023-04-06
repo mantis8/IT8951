@@ -1,14 +1,14 @@
-# _mati::IT8951\<BufferSize\>::_**setVcom**
+# _mati::IT8951\<BufferSize\>::_**enableParameterPack**
 
 ```cpp
-Status setVcom(const float vcom);
+Status enableParameterPack();
 ```
-Sets the VCOM value. This operation should always be called before refreshing the display for the first time to ensure correct behavior. The VCOM value is dependent on the used display and can be found on the connector.
+
+Enables the IT8951 to accept a continuation of parameters. To ensure correct behavior, this function should always be called immediately after instantiation.
 
 ## Parameters
 
-- `vcom`  
-The VCOM value required by the connected display.
+(none)
 
 ## Return value
 

@@ -1,7 +1,7 @@
 # _mati::IT8951\<BufferSize\>::_**writeImage**
 
 ```cpp
-Status writeImage(const std::span<uint16_t> image, const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
+Status writeImage(const uint32_t imageBufferAddress, const std::span<uint16_t> image, const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
 ```
 
 Writes the image to the buffer of the IT8951. To display the buffer, use the member function [display](display.md). The image in one dimensional form translates as follows to the display:
@@ -10,7 +10,9 @@ Writes the image to the buffer of the IT8951. To display the buffer, use the mem
 
 ## Parameters
 
-- `data`    
+- `imageBufferAddress`  
+The image buffer address, which can be obtained by calling the member function [getDeviceInfo](getDeviceInfo.md).
+- `image`    
 The image held by a one dimensional data buffer.
 - `xCoordinate`  
 The X coordinate of the lower left corner point of the image.
