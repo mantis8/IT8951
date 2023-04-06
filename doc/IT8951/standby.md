@@ -4,7 +4,7 @@
 Status standby();
 ```
 
-Puts the IT8951 to standby. It may be necessary to perform a reset afterwards. See the [IT8951 Specifications] for more information about the power management.
+Puts the IT8951 to standby. See the [IT8951 Specifications] for more information about the power management.
 
 ## Parameters
 

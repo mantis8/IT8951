@@ -4,7 +4,7 @@
 void reset();
 ```
 
-Resets the IT8951.
+Resets the IT8951. Call the member functions [enableParameterPack](enableParameterPack.md) and [setVcom](setVcom.md) after to ensure correct behavior.
 
 ## Parameters
 
