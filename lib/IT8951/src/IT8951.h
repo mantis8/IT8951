@@ -107,7 +107,7 @@ class IT8951 {
 template<size_t BufferSize>
 IT8951<BufferSize>::IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetPin, hardware_abstraction::IGpio& busyPin)
                            : txBuffer_{}, rxBuffer_{}, busyFlag_{}, spi_{spi}, resetPin_{resetPin}, busyPin_{busyPin} {
-    static_assert(BufferSize >= 2, "BufferSize needs to be at least 2");
+    static_assert(BufferSize >= 2, "BufferSize needs to be at least 2"); // 2 => preamble + dummy
 
     busyFlag_.clear();
     resetPin_.write(true);
@@ -330,7 +330,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeData(const std::span<uint16_
         return Status::busy;
     }
 
-    const auto transferSize = buffer.size() + 1u; // +1 word preamble
+    const auto transferSize = buffer.size() + 1u; // 1 => preamble
     if (transferSize > BufferSize) { 
         return Status::error;
     }
@@ -358,7 +358,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::readData(const std::span<uint16_t
         return Status::busy;
     }
 
-    const auto transferSize = buffer.size() + 2u; // +2 word preamble and dummy
+    const auto transferSize = buffer.size() + 2u; // 2 => preamble + dummy
     if (transferSize > BufferSize) { 
         return Status::error;
     }
@@ -374,7 +374,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::readData(const std::span<uint16_t
         result = Status::error;    
     }
 
-    std::copy(rxBuffer_.begin() + 2, rxBuffer_.begin() + transferSize, buffer.begin()); // +2 word preamble and dummy
+    std::copy(rxBuffer_.begin() + 2, rxBuffer_.begin() + transferSize, buffer.begin()); // 2 => preamble + dummy
 
     busyFlag_.clear(std::memory_order_release);
 
@@ -397,7 +397,7 @@ std::tuple<typename IT8951<BufferSize>::Status, uint16_t> IT8951<BufferSize>::re
 
     auto result = writeCommand(cReadRegister_, parameters);
     if (Status::ok != result) {
-        return result;
+        return {result, 0};
     }
 
     std::array<uint16_t, 1> buffer;
@@ -405,7 +405,7 @@ std::tuple<typename IT8951<BufferSize>::Status, uint16_t> IT8951<BufferSize>::re
 
     result = readData(buffer);
     if (Status::ok != result) {
-        return result;
+        return {result, 0};
     }
 
     return {Status::ok, buffer.at(0)};
