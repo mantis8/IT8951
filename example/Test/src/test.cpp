@@ -1,11 +1,11 @@
-//#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include <stdexcept>
 #include <cstdint>
 #include <tuple>
 #include <thread>
 
-//#include "doctest.h"
+#include "doctest.h"
 #include "IT8951.h"
 #include "Spi.h"
 #include "Gpio.h"
@@ -18,7 +18,7 @@ bool compare(float a, float b, float epsilon) {
     return std::abs(a - b) < epsilon;
 }
 
-int main() {
+TEST_CASE("Test 1") {
     try {
         mati::hardware_abstraction::Spi spi{};
         spi.setClockFrequency(2*1000*1000);
@@ -26,54 +26,78 @@ int main() {
         mati::hardware_abstraction::Gpio resetPin{17, mati::hardware_abstraction::Gpio::Functionality::output};
         mati::hardware_abstraction::Gpio busyPin{24, mati::hardware_abstraction::Gpio::Functionality::input};   
 
-        constexpr uint32_t bufferSize = (1872*1404 / 32) + 2; // 
+        constexpr uint32_t displayWidth = 468;
+        constexpr uint32_t displayHeight = 351;
+        constexpr uint32_t dataSize = displayWidth * displayHeight / 2 / 2;
+
+        constexpr uint32_t bufferSize = dataSize + 2;
         mati::IT8951<bufferSize> it8951{spi, resetPin, busyPin};
 
-        it8951.enableParameterPack();
-        it8951.setVcom(-1.25f);
+        it8951.reset();
+
+        CHECK(mati::IT8951<bufferSize>::Status::ok == it8951.enableParameterPack());
+        CHECK(mati::IT8951<bufferSize>::Status::ok == it8951.setVcom(-1.25f));
  
         mati::IT8951<bufferSize>::Status result{mati::IT8951<bufferSize>::Status::error};
         mati::IT8951<bufferSize>::DeviceInfo info;
         std::tie(result, info) = it8951.getDeviceInfo();
+        CHECK(mati::IT8951<bufferSize>::Status::ok == result);
 
         std::cout << "Device info: " << std::endl
-                  << "  width =              " << info.width << std::endl
-                  << "  height =             " << info.height << std::endl
+                  << "  width =               " << info.width << std::endl
+                  << "  height =              " << info.height << std::endl
                   << "  image buffer address = " << std::hex << info.imageBufferAddress << std::dec << std::endl
-                  << "  firmware version =    " << info.firmwareVersion << std::endl
-                  << "  LUT version =         " << info.lutVersion << std::endl;
+                  << "  firmware version =     " << info.firmwareVersion << std::endl
+                  << "  LUT version =          " << info.lutVersion << std::endl;
+        
+        // wait for display to be ready
+        bool ready = false;
+        std::tie(result, ready) = it8951.isDisplayReady();
+        CHECK(mati::IT8951<bufferSize>::Status::ok == result);
+
+        if (!ready) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            std::tie(result, ready) = it8951.isDisplayReady();
+            CHECK(mati::IT8951<bufferSize>::Status::ok == result);
+        }
+
+        CHECK(mati::IT8951<bufferSize>::Status::ok == it8951.clear(0, 0, 1872, 1404));
 
         // display grayscales
-        std::array<uint16_t, (468*351)/2> gray{};
+        std::array<uint16_t, dataSize> gray{};
 
-        for (uint32_t i = 0; i < 16; i++) {           
-            gray.fill((i*17));
+        for (uint32_t i = 0; i < 16; i++) {
+            uint16_t pixelValue = i*17;
+            uint16_t value = pixelValue<<8 | pixelValue;
+
+            gray.fill(value);
             
-            const uint32_t x = (i*468/2) % 1872;
-            const uint32_t y = (i-i%4)*351/4;
+            const uint32_t x = (i*displayWidth) % 1872;
+            const uint32_t y = (i-i%4)*displayHeight/4;
 
-            it8951.writeImage(info.imageBufferAddress, gray, x, y, 468/2, 351);  
+            CHECK(mati::IT8951<bufferSize>::Status::ok == it8951.writeImage(info.imageBufferAddress, gray, x, y, displayWidth, displayHeight));  
 
-            bool ready = false;
+            // wait for display to be ready
+            ready = false;
             std::tie(result, ready) = it8951.isDisplayReady();
+            CHECK(mati::IT8951<bufferSize>::Status::ok == result);
 
-            while (!ready) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            if (!ready) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
                 std::tie(result, ready) = it8951.isDisplayReady();
+                CHECK(mati::IT8951<bufferSize>::Status::ok == result);
             }
 
-            it8951.display(x, y, 468, 351);
-        }
-              
+            CHECK(mati::IT8951<bufferSize>::Status::ok == it8951.display(x, y, displayWidth, displayHeight));
 
+        }
+        
 
     } catch (std::runtime_error& e) {
-        std::cout << "exception occured: " << std::string(e.what()) << std::endl; 
+        CHECK_MESSAGE(false, "exception occured: ", std::string(e.what())); 
     }
-
-
-    return 0;
 }
+
 
 /*
 
