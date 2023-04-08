@@ -11,6 +11,8 @@ Gpio::Gpio(const uint32_t pin, const Functionality functionality) : pin_{pin}, c
     // initialize the bcm library
     (void)InitManager::getInstance();
 
+    bcm2835_gpio_set_pud(pin_, BCM2835_GPIO_PUD_DOWN);
+
     switch (functionality) {
       case Functionality::input:        
         bcm2835_gpio_fsel(pin_, BCM2835_GPIO_FSEL_INPT);
@@ -24,8 +26,6 @@ Gpio::Gpio(const uint32_t pin, const Functionality functionality) : pin_{pin}, c
         throw std::runtime_error("invalid gpio functionality");
         break;
     }
-
-    bcm2835_gpio_set_pud(pin_, BCM2835_GPIO_PUD_DOWN);
 
     isRunning_ = true;
     edgeDetector_ = std::thread{&Gpio::detectRisingEdge, this};
@@ -63,12 +63,10 @@ void Gpio::detectRisingEdge() {
     while (isRunning_) {
         if (!read()) {
             while (!read()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                // busy wait
             }
             callback_();
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
 
