@@ -237,9 +237,8 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeImage(const uint32_t imageBu
         return result;
     }
 
-    // TODO change bpp to 4!!!
     std::array<uint16_t, 5> parameters{};
-    parameters.at(0) = 0x0030; // 0x0{endianesss}{bbp}{rotate}
+    parameters.at(0) = 0x0020; // 0x0{endianesss}{bit per pixel}{rotate}: 0 => 1 bpp, 1 => 2 bpp, 2 => 4 bpp, 3 => 8 bpp 
     parameters.at(1) = xCoordinate;
     parameters.at(2) = yCoordinate;
     parameters.at(3) = width;
@@ -339,7 +338,7 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::writeData(const std::span<uint16_
 
     txBuffer_.at(0) = cWriteData_;
 
-    std::copy(buffer.begin(), buffer.end(), txBuffer_.begin());
+    std::copy(buffer.begin(), buffer.end(), txBuffer_.begin() + 1u); // 1 => preamble
     
     waitUntilIdle();
 
