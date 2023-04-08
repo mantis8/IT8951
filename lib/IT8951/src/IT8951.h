@@ -424,11 +424,6 @@ IT8951<BufferSize>::Status IT8951<BufferSize>::refresh(const uint16_t xCoordinat
 
 template<size_t BufferSize>
 void IT8951<BufferSize>::waitUntilIdle() {
-    while (!busyPin_.read()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-
-/*
     if (busyPin_.read()) {
         return;
     }
@@ -449,7 +444,7 @@ void IT8951<BufferSize>::waitUntilIdle() {
         busySemaphore.acquire(); 
     }
 
-    busyPin_.setRisingEdgeCallback([](){});*/
+    busyPin_.setRisingEdgeCallback([](){});
 }
 
 } // mati
