@@ -1,4 +1,10 @@
 //
+// Copyright (c) 2023 Manuel Tischhauser
+//
+// Distributed under the GNU GENERAL PUBLIC LICENSE Version 3
+// See accompanying file LICENSE-example or copy at
+// https://www.gnu.org/licenses/gpl-3.0.html
+//
 // A class which provides GPIO access.
 //
 
