@@ -4,9 +4,7 @@
 Status writeImage(const uint32_t imageBufferAddress, const std::span<uint16_t> image, const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
 ```
 
-Writes the image to the buffer of the IT8951. To display the buffer, use the member function [display](display.md). The image in one dimensional form translates as follows to the display:
-
-// TODO  graphic
+Writes the image to the buffer of the IT8951. To display the buffer, use the member function [display](display.md).
 
 ## Parameters
 

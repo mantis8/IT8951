@@ -4,7 +4,7 @@
 IT8951(hardware_abstraction::ISpi& spi, hardware_abstraction::IGpio& resetGpo, hardware_abstraction::IGpio& busyGpi);
 ```
 
-Constructs the IT8951.
+Constructs the IT8951. Statically allocates two 16 bit buffers of size `BufferSize`. This size - 2 (preamble + dummy word) limits the amount of data which can be sent in one command to the IT8951. 
 
 ## Parameters
 
@@ -14,7 +14,3 @@ The SPI connected to the IT8951.
 The GPIO connected to the reset pin of the IT8951. This pin needs to be writable.
 - `busyGpi`  
 The GPIO connected to the busy pin of the IT891. This pin needs to be readable.
-
-## Note
-
-TODO: memory allocation
