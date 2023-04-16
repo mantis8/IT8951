@@ -2,59 +2,53 @@
 
 - [IT8951](#it8951)
   - [Introduction](#introduction)
-  - [Example](#example)
-  - [Detailed documentation](#detailed-documentation)
-  - [Integration](#integration)
-  - [Notes](#notes)
+  - [Documentation](#detailed-documentation)
+  - [Usage](#usage)
   - [Dependencies](#dependencies)
-  - [References](#references)
+  - [License](#license)
 
 ## Introduction
 
-This module provides a generic driver for the IT8951 e-paper controller by Waveshare. 
+This module provides a generic driver for the IT8951 e-paper controller by Waveshare. It has the following properties:
+- Written in C++20
+- No hardware dependencies. Any host with the required SPI and GPIOs can use this module.
+- No dynamic memory allocation.
 
-The module is written in C++20 with the following design goals:
-1. Generic:
-   - Works with display using the IT8951
-   - No hardware dependencies, any host controller with the required SPI and GPIO can use this module.
-2. Usable in memory and performance restricted software
-   - No dynamic memory allocation
+Refer to the [Waveshare wiki] or the [IT8951 Specifications] for more information about the IT8951 and the corresponding e-paper displays.
 
-## Example
+## Documentation
 
-## Detailed documentation
+The documentation can be found in the folder [documentation](documentation).
 
-You can find a detailed documentation in the folder "doc"
+## Usage
 
-## Integration
+Add the folder [module](module) to your repository and implement the SPI and GPIO interfaces. An example can be found in the folder [example](example). The example uses the following hardware:
 
-Build your code with C++20 or later.
+- IT8951 Driver HAT
+- RaspberryPi 4
+- 10.3 inch e-paper display
 
-## Notes
+Do not use the example in your production code. It is only there to help you with your own integration and is not meant for real apllications. Also, because of its dependencies, it cannot be released under the MIT license.
 
 ## Dependencies
 
 The IT8951 module depends on the following headers of the C++ standard library:
 
-- `<span>`
+- `<algorithm>`
 - `<array>`
+- `<atomic>`
 - `<cstdint>`
 - `<functional>`
-- `<atomic>`
+- `<limits>`
+- `<semaphore>`
+- `<span>`
 - `<string>`
 - `<thread>`
-- `<algorithm>`
-- `<limits>`
 - `<tuple>`
 
-[_Waveshare Wiki_]
+## License
 
-## References
+This module is released under the MIT license (see accompanying file LICENSE). The [example](example) however is released under the GNU GENERAL PUBLIC LICENSE Version 3 (see accompanying file LICENSE-example).
 
-1. Waveshare wiki. [waveshare-wiki], 29 January 2023, https://www.waveshare.com/wiki/Main_Page#Display-e-Paper
-2. IT8951 specifications. [IT8951 Specifications], https://www.waveshare.com/w/upload/1/18/IT8951_D_V0.2.4.3_20170728.pdf
-3. Kirilov, Viktor. [_doctest_][doctest], 05.02.2020, https://github.com/onqtam/doctest, MIT
-
-[waveshare-wiki]: https://www.waveshare.com/wiki/Main_Page#Display-e-Paper
+[Waveshare Wiki]: https://www.waveshare.com/wiki/Main_Page#Display-e-Paper
 [IT8951 Specifications]: https://www.waveshare.com/w/upload/1/18/IT8951_D_V0.2.4.3_20170728.pdf
-[doctest]:  https://github.com/onqtam/doctest
