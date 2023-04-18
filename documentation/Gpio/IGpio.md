@@ -10,7 +10,7 @@ Defines the GPIO functionality needed to access the IT8951. It's the same interf
 
 ## Member functions
 
-- [write](write.md) 
+- [write](write.md)
 - [read](read.md)
 - [setRisingEdgeCallback](setRisingEdgeCallback.md)
 

@@ -10,6 +10,7 @@
 ## Introduction
 
 This module provides a generic driver for the IT8951 e-paper controller by Waveshare. It has the following properties:
+
 - Written in C++20
 - No hardware dependencies. Any host with the required SPI and GPIOs can use this module.
 - No dynamic memory allocation.

@@ -12,4 +12,5 @@ Sets the pin to the value according to `level` (`false` = low, `true` = high).
 The level to be set.
 
 ## Return value
+
 (none)

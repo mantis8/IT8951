@@ -11,4 +11,5 @@ Reads the level of the GPIO.
 (none)
 
 ## Return value
-`false` if level is low and `true` if high. 
+
+`false` if level is low and `true` if high.

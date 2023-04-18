@@ -10,7 +10,7 @@ Defines the SPI (master) functionality needed to access the IT8951.
 
 ## Member functions
 
-- [transfer](transfer.md) 
+- [transfer](transfer.md)
 
 ## Notes
 

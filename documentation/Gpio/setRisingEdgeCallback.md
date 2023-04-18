@@ -12,4 +12,5 @@ Sets the function which is called when a rising edge is detected on this pin.
 The rising edge callback function.
 
 ## Return value
+
 (none)
