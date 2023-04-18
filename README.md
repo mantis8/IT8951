@@ -2,7 +2,7 @@
 
 - [IT8951](#it8951)
   - [Introduction](#introduction)
-  - [Documentation](#detailed-documentation)
+  - [Documentation](#documentation)
   - [Usage](#usage)
   - [Dependencies](#dependencies)
   - [License](#license)
