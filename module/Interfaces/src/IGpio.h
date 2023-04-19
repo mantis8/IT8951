@@ -22,6 +22,6 @@ class IGpio {
     virtual void setRisingEdgeCallback(std::function<void(void)>&& callback) noexcept = 0;
 };
 
-} // mati::hardware_abstraction
+} // namespace mati::hardware_abstraction
 
 #endif // MATI_HARDWARE_ABSTRACTION_IGPIO_H

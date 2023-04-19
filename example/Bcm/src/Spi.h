@@ -26,6 +26,6 @@ class Spi : public ISpi {
     bool transfer(std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) noexcept override;
 };
 
-} // mati::hardware_abstraction
+} // namespace mati::hardware_abstraction
 
 #endif // MATI_HARDWARE_ABSTRACTION_SPI_H

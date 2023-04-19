@@ -24,6 +24,6 @@ class InitManager {
 };
 
 
-} // mati::hardware_abstraction
+} // namespace mati::hardware_abstraction
 
 #endif // MATI_HARDWARE_ABSTRACTION_INITMANAGER_H

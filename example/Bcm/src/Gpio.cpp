@@ -78,4 +78,4 @@ void Gpio::detectRisingEdge() {
     }
 }
 
-} // mati::hardware_abstraction
+} // namespace mati::hardware_abstraction

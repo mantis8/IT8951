@@ -447,6 +447,6 @@ void IT8951<BufferSize>::waitUntilIdle() {
     busyPin_.setRisingEdgeCallback([](){});
 }
 
-} // mati
+} // namespace mati
 
 #endif // MATI_IT8951_H

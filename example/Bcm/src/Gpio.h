@@ -43,6 +43,6 @@ class Gpio : public IGpio {
     std::atomic_bool isRunning_;
 };
 
-} // mati::hardware_abstraction
+} // namespace mati::hardware_abstraction
 
 #endif // MATI_HARDWARE_ABSTRACTION_GPIO_H

@@ -31,4 +31,4 @@ InitManager::~InitManager() {
     (void)bcm2835_close();
 }
 
-} // mati::hardware_abstraction
+} // namespace mati::hardware_abstraction

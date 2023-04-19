@@ -59,4 +59,4 @@ bool Spi::transfer(std::span<uint16_t> txBuffer, std::span<uint16_t> rxBuffer) n
 
     return true;
 }
-} // mati::hardware_abstraction
+} // namespace mati::hardware_abstraction
