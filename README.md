@@ -24,7 +24,7 @@ The documentation can be found in the folder [documentation](documentation).
 
 ## Usage
 
-Add the folder [module](module) to your repository and implement the SPI and GPIO interfaces. An example can be found in the folder [example](example). The example uses the following hardware:
+Add the [module](module) to your repository and implement the SPI and GPIO interfaces. An example can be found in the folder [example](example). The example uses the following hardware:
 
 - IT8951 Driver HAT
 - RaspberryPi 4
