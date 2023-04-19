@@ -4,7 +4,7 @@
 Status display(const uint16_t xCoordinate, const uint16_t yCoordinate, const uint16_t width, const uint16_t height);
 ```
 
-Displays the selected part of the display. Before calling this function, the state of the display should be queried by calling the member function [isDisplayReady](isDisplayReady.md). To write to the buffer, use the member function [writeImage](writeImage.md).
+Displays the selected part of the screen. Before calling this function, the state of the display should be queried by calling the member function [isDisplayReady](isDisplayReady.md). To write to the buffer, use the member function [writeImage](writeImage.md).
 
 ## Parameters
 

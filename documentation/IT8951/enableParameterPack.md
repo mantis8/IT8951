@@ -4,7 +4,7 @@
 Status enableParameterPack();
 ```
 
-Enables the IT8951 to accept a continuation of parameters. To ensure correct behavior, this function should always be called immediately after the instantiation or a [reset](reset.md). Calls to other member functions before this might fail otherwise.
+Enables the IT8951 to accept a continuation of parameters. To ensure correct behavior, this function should always be called immediately after instantiation or a [reset](reset.md). Calls to other member functions before this might fail otherwise.
 
 ## Parameters
 

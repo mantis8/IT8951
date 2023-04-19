@@ -4,7 +4,7 @@
 Status setVcom(const float vcom);
 ```
 
-Sets the VCOM value. This function should always be called after the instantiating or a [reset](reset.md) to ensure correct behavior. The VCOM value is dependent on the used display and can be found on the connector.
+Sets the VCOM value. This function should always be called after instantiation or a [reset](reset.md) to ensure correct behavior. The VCOM value is dependent on the used display and can be found on the connector.
 
 ## Parameters
 
