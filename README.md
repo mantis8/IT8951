@@ -11,9 +11,10 @@
 
 This module provides a generic driver for the IT8951 e-paper controller by Waveshare. It has the following properties:
 
-- Written in C++20
+- Written in C++20.
 - No hardware dependencies. Any host with the required SPI and GPIOs can use this module.
 - No dynamic memory allocation.
+- Thread safe, meaning that simultaneous calls from different threads do not lead to undefined behavior.
 
 Refer to the [Waveshare wiki] or the [IT8951 Specifications] for more information about the IT8951 and the corresponding e-paper displays.
 
@@ -49,7 +50,7 @@ The IT8951 module depends on the following headers of the C++ standard library:
 
 ## License
 
-This module is released under the MIT license (see accompanying file LICENSE). The [example](example) however is released under the GNU GENERAL PUBLIC LICENSE Version 3 (see accompanying file LICENSE-example).
+This module is distributed under the MIT license (see accompanying file LICENSE). The [example](example) however is distributed under the GNU GENERAL PUBLIC LICENSE Version 3 (see accompanying file LICENSE-example).
 
 [Waveshare Wiki]: https://www.waveshare.com/wiki/Main_Page#Display-e-Paper
 [IT8951 Specifications]: https://www.waveshare.com/w/upload/1/18/IT8951_D_V0.2.4.3_20170728.pdf
