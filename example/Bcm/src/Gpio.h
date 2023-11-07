@@ -11,10 +11,10 @@
 #ifndef MATI_HARDWARE_ABSTRACTION_GPIO_H
 #define MATI_HARDWARE_ABSTRACTION_GPIO_H
 
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <thread>
-#include <atomic>
 
 #include "IGpio.h"
 

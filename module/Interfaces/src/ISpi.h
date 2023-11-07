@@ -11,8 +11,8 @@
 #ifndef MATI_HARDWARE_ABSTRACTION_ISPI_H
 #define MATI_HARDWARE_ABSTRACTION_ISPI_H
 
-#include <span>
 #include <cstdint>
+#include <span>
 
 namespace mati::hardware_abstraction {
 

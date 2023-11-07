@@ -11,16 +11,19 @@
 #ifndef MATI_IT8951_H
 #define MATI_IT8951_H
 
-#include <string>
-#include <cstdint>
-#include <span>
-#include <atomic>
-#include <array>
-#include <tuple>
-#include <semaphore>
-#include <thread>
 #include <algorithm>
+#include <array>
+#include <atomic>
+#include <cstdint>
 #include <limits>
+#include <semaphore>
+#include <span>
+#include <string>
+#include <thread>
+#include <tuple>
+
+
+
 
 #include "ISpi.h"
 #include "IGpio.h"
