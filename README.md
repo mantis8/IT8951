@@ -30,7 +30,7 @@ Add the [module](module) to your repository and implement the SPI and GPIO inter
 - RaspberryPi 4
 - 10.3 inch e-paper display
 
-Do not use the example in your production code. It is only there to help you with your own integration and is not meant for real apllications. Also, because of its dependencies, it cannot be released under the MIT license.
+Do not use the example in your production code. It is only there to help you with your own integration and is not meant for real aplications. Also, because of its dependencies, it cannot be released under the MIT license.
 
 ## Dependencies
 
